@@ -99,5 +99,19 @@ def edit(movie_id):
     return render_template("edit.html", form=form, movie_id=int(movie_id), movielist=open_db())
 
 
+
+
+@app.route("/delete/<movie_id>", methods=('GET', 'POST'))
+def delete(movie_id):
+    form = EditForm()
+    print(type(request.form))
+    with app.app_context():
+        movie_to_delete = db.session.execute(db.select(Movies).where(Movies.id == movie_id)).scalar()
+        db.session.delete(movie_to_delete)
+        db.session.commit()
+
+    return redirect(url_for("home"))
+
+
 if __name__ == '__main__':
     app.run(debug=True)
