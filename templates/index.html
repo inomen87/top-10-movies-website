@@ -36,8 +36,20 @@
                     {{ value.description }}
                 </p>
 
-                <a href="#" class="button">Update</a>
-                <a href="#" class="button delete-button">Delete</a>
+
+
+
+
+
+
+
+
+                  <form action="{{ url_for('edit', movie_id=key) }}" method="get">
+    <a class="button" href="{{ url_for('edit', movie_id=key) }}">Update</a>
+
+
+
+                <a href="#" class="button delete-button">Delete</a></form>
 
               </div>
             </div>

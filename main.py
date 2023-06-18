@@ -3,7 +3,7 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, URLField
+from wtforms import StringField, SubmitField, URLField, FloatField, TextAreaField
 from wtforms.validators import DataRequired, URL
 import requests
 from sqlalchemy.exc import OperationalError
@@ -20,12 +20,28 @@ Bootstrap(app)
 
 
 
+
+
+
+
+class EditForm(FlaskForm):
+    rating = FloatField('Your Rating', validators=[DataRequired()], render_kw={'style': 'width: 40ch'})
+    review = TextAreaField('Your Review', render_kw={'style': 'width: 40ch'})
+
+    submit = SubmitField('Done')
+
+
+
+
+
+
+
 class Movies(db.Model):
    id = db.Column(db.Integer, primary_key=True)
    year  = db.Column(db.Integer, nullable=False)
    title  = db.Column(db.String(250), nullable=False)
    description  = db.Column(db.String(500), nullable=False)
-   review  = db.Column(db.String(2000), nullable=False)
+   review  = db.Column(db.String(2000))
    img_url  = db.Column(db.String(500), nullable=False)
    rating = db.Column(db.Float(), nullable=False)
    ranking = db.Column(db.Integer, nullable=False)
@@ -63,6 +79,24 @@ def open_db():
 @app.route("/")
 def home():
     return render_template("index.html", movielist=open_db())
+
+
+
+
+@app.route("/edit/<movie_id>", methods=('GET', 'POST'))
+def edit(movie_id):
+    form = EditForm()
+    print(type(request.form))
+    if form.validate_on_submit():
+        with app.app_context():
+            movie_to_update = db.session.execute(db.select(Movies).where(Movies.id == movie_id)).scalar()
+            movie_to_update.rating = request.form["rating"]
+            movie_to_update.review = request.form["review"]
+            db.session.commit()
+
+        return redirect(url_for('home'))
+
+    return render_template("edit.html", form=form, movie_id=int(movie_id), movielist=open_db())
 
 
 if __name__ == '__main__':
