@@ -50,12 +50,11 @@ def open_db():
             db.create_all()
         finally:
             all_movies = list(db.session.execute(db.select(Movies)).scalars())
-            all_movies = {movie.id: {"title": movie.title, "year": movie.year, "review": movie.review,  "img_url": movie.img_url, "rating": movie.rating, "ranking": movie.ranking} for movie in all_movies}
+            all_movies = {movie.id: {"title": movie.title, "year": movie.year, "review": movie.review,  "img_url": movie.img_url, "rating": movie.rating, "ranking": movie.ranking, "description": movie.description} for movie in all_movies}
 
     print(all_movies)
     return all_movies
 
-open_db()
 
 
 
@@ -63,7 +62,7 @@ open_db()
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("index.html", movielist=open_db())
 
 
 if __name__ == '__main__':
